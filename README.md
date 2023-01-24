@@ -114,9 +114,10 @@ I Installed WordPress on the Web Server EC2 Instance
 sudo yum -y update
 ```
 Install wget, Apache and it’s dependencies
-```
+
 
 ![Install Apache](https://github.com/deleonab/web-server-db-server-wordpress/blob/master/apachesuccessfullyinstalled.JPG?raw=true)
+```
 sudo yum -y install wget httpd php php-mysqlnd php-fpm php-json
 ```
 Start Apache
