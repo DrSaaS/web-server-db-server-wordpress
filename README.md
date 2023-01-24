@@ -116,15 +116,19 @@ sudo yum -y update
 Install wget, Apache and it’s dependencies
 
 
-![Install Apache](https://github.com/deleonab/web-server-db-server-wordpress/blob/master/apachesuccessfullyinstalled.JPG?raw=true)
+
 ```
 sudo yum -y install wget httpd php php-mysqlnd php-fpm php-json
 ```
+![Install Apache](https://github.com/deleonab/web-server-db-server-wordpress/blob/master/apachesuccessfullyinstalled.JPG?raw=true)
+
 Start Apache
 ```
 sudo systemctl enable httpd
 sudo systemctl start httpd
 ```
+![Start Apache](https://github.com/deleonab/web-server-db-server-wordpress/blob/master/httpdstart.JPG?raw=true)
+
 To install PHP and it’s dependencies
 ```
 sudo yum install https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
@@ -196,5 +200,9 @@ I will now enable TCP port 80 in the Inbound Rules configuration for the Web Ser
 
 I will nowaccess from my browser the link to your WordPress http://<Web-Server-Public-IP-Address>/wordpress/
  
+![Wordpress Installed](https://github.com/deleonab/web-server-db-server-wordpress/blob/master/wordpressinstallpage.JPG?raw=true)
  
  
+ \
+ \
+ ![Wordpress logged in](https://github.com/deleonab/web-server-db-server-wordpress/blob/master/wordpress-installed-loggedin.JPG?raw=true)
