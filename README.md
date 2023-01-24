@@ -1,15 +1,108 @@
-Our 3-Tier Setup
-A Laptop or PC to serve as a client
-An EC2 Linux Server as a web server (Here we shall install WordPress)
-An EC2 Linux server as a database (DB) server
-We shall use RedHat OS for this project
+Task
+----
+Deploy a Wordpress Application in a 3-Tier Setup on EC2 Instances
 
-#I  launched 2 EC2 Instance (Red Hat Linux) - One for the webserver and the other for the database server.
+- Presentation Layer  This is the user interface - client server or browser on laptop.
+- Business Layer : Application or Webserver - An EC2 Linux Server as a web server (Here we shall install WordPress)
+- Data Access or Management Layer : - An EC2 Linux server as a database (DB) server 
 
-# I launched 3 10Gib EBS Volumes (In the same AZ euwest-2b-) and attached them to each instance
+- Launch, attach and configure EBS Volumes
+-  We shall use RedHat OS for this project
 
-Instance(Webserver)
-VolWebserver1, VolWebserver2, VolWebserver3 
+I  launched an EC2 Instance (Red Hat Linux) - to act as the web server.
+\
+\
+![Instance One Webserver](https://github.com/deleonab/web-server-db-server-wordpress/blob/master/instanceWebServer.JPG?raw=true)
+
+I launched 3 10Gib EBS Volumes (In the same AZ euwest-2b-) and attached them to the webserver instance
+I used Gdisk to partition each disk 
+
+```
+sudo gdisk /dev/xvdf
+
+ GPT fdisk (gdisk) version 1.0.3
+
+Partition table scan:
+  MBR: not present
+  BSD: not present
+  APM: not present
+  GPT: not present
+
+Creating new GPT entries.
+
+Command (? for help branch segun-edits: p
+Disk /dev/xvdf: 20971520 sectors, 10.0 GiB
+Sector size (logical/physical): 512/512 bytes
+Disk identifier (GUID): D936A35E-CE80-41A1-B87E-54D2044D160B
+Partition table holds up to 128 entries
+Main partition table begins at sector 2 and ends at sector 33
+First usable sector is 34, last usable sector is 20971486
+Partitions will be aligned on 2048-sector boundaries
+Total free space is 2014 sectors (1007.0 KiB)
+
+Number  Start (sector)    End (sector)  Size       Code  Name
+   1            2048        20971486   10.0 GiB    8E00  Linux LVM
+
+Command (? for help): w
+
+Final checks complete. About to write GPT data. THIS WILL OVERWRITE EXISTING
+PARTITIONS!!
+
+Do you want to proceed? (Y/N): yes
+OK; writing new GUID partition table (GPT) to /dev/xvdf.
+The operation has completed successfully.
+Now,  your changes has been configured succesfuly, exit out of the gdisk console and do the same for the remaining disks.
+```
+\
+\
+I then used the pvcreate utility to mark each as physical volumes (after installing lvm2)
+```
+sudo pvcreate /dev/xvdf1
+sudo pvcreate /dev/xvdg1
+sudo pvcreate /dev/xvdh1
+```
+
+Use the vgcreate utility to add all 3 PVs to a volume group (VG). I named the VG webdata-vg
+```
+sudo vgcreate webdata-vg /dev/xvdh1 /dev/xvdg1 /dev/xvdf1
+```
+Then I created the logical volumes
+```
+sudo lvcreate -n apps-lv -L 14G webdata-vg
+sudo lvcreate -n logs-lv -L 14G webdata-vg
+```
+
+The next step is to use mkfs.ext4 to format the logical volumes with ext4 filesystem
+```
+sudo mkfs -t ext4 /dev/webdata-vg/apps-lv
+sudo mkfs -t ext4 /dev/webdata-vg/logs-lv
+```
+Now we should prepare the file structure for our website
+I will create the /var/www/html directory to store the website files and  /home/recovery/logs to store a backup of log data
+```
+sudo mkdir -p /var/www/html
+
+sudo mkdir -p /home/recovery/logs
+```
+Finally, I will mount /var/www/html on apps-lv logical volume
+```
+sudo mount /dev/webdata-vg/apps-lv /var/www/html/
+```
+
+I will use the rsync utitilty to back up all the files in the log directory /var/log into /home/recovery/logs as all data on /var/log will be wiped off.
+```
+sudo rsync -av /var/log/. /home/recovery/logs/
+```
+Mount /var/log on logs-lv logical volume
+```
+sudo mount /dev/webdata-vg/logs-lv /var/log
+```
+Restore log files back into /var/log directory
+```
+sudo rsync -av /home/recovery/logs/. /var/log
+```
+We will update the /etc/fstab file so that the mount configuration will persist after restart of the server.
+
 
 # I connected (SSH)into my webserver instance from the terminal (Windows Terminal) and from the local directory
 in which the pem key was stored.
@@ -22,7 +115,7 @@ lsblk
 ls /dev/ to see all devicesattached
 
 df -h To see all mounts and free space
-
+![Volume group](https://github.com/deleonab/web-server-db-server-wordpress/blob/master/vgcreate.JPG?raw=true)
 # Next, we use gdisk utility to create a single partition on each of the 3 disk volumes by running:
 
 sudo gdisk /dev/xvdf(or volume name) - Partition the 1st volume
