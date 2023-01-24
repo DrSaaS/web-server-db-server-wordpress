@@ -1,13 +1,14 @@
 Task
 ----
-Deploy a Wordpress Application in a 3-Tier Setup on EC2 Instances
+The goal is to deploy a Wordpress Application in a 3-Tier Setup on EC2 Instances
 
 - Presentation Layer  This is the user interface - client server or browser on laptop.
 - Business Layer : Application or Webserver - An EC2 Linux Server as a web server (Here we shall install WordPress)
 - Data Access or Management Layer : - An EC2 Linux server as a database (DB) server 
-
 - Launch, attach and configure EBS Volumes
 -  We shall use RedHat OS for this project
+
+---
 
 I  launched an EC2 Instance (Red Hat Linux) - to act as the web server.
 \
@@ -198,7 +199,7 @@ command and see a list of existing databases.
 
 I will now enable TCP port 80 in the Inbound Rules configuration for the Web Server EC2 (enable from everywhere 0.0.0.0/0)
 
-I will nowaccess from my browser the link to your WordPress http://<Web-Server-Public-IP-Address>/wordpress/
+I will now access from my browser the link to your WordPress http://<Web-Server-Public-IP-Address>/wordpress/
  
 ![Wordpress Installed](https://github.com/deleonab/web-server-db-server-wordpress/blob/master/wordpressinstallpage.JPG?raw=true)
  
